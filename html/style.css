@@ -1,82 +1,226 @@
-@import url('https://fonts.googleapis.com/css2?family=Pathway+Gothic+One&display=swap');
+/* vCore Progressbar Styles */
 
-html {
-    overflow: hidden;
-    font-family: "Pathway Gothic One", sans-serif;
-    font-size: 1.7vh;
-
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-    background: transparent !important;
-    margin: 0;
-    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow: hidden;
-    height: 100%;
-    width: 100%;
+    background: transparent;
 }
 
-.progress-container {
-    display: none;
-    z-index: 5;
-    color: #fff;
-    width: 19%;
+/* Container */
+#progressbar-container {
     position: fixed;
-    bottom: 5%;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    z-index: 9999;
+}
+
+#progressbar-container.active {
+    display: block;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Progressbar Wrapper */
+.progressbar-wrapper {
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 24px 32px;
+    min-width: 420px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progressbar-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
     left: 0;
     right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 1.7vh;
-    font-family: "Pathway Gothic One", sans-serif;
-    font-style: normal;
-    
-}
-
-.progress-labels {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#progress-label {
-    font-size: 1.7vh;
-    line-height: 4vh;
-    position: relative;
-    color: #ffffff;
-    z-index: 10;
-    font-weight: bold;
-}
-
-#progress-percentage {
-    font-size: 1.7vh;
-    line-height: 4vh;
-    position: relative;
-    color: #9ACD32;
-    z-index: 10;
-    font-weight: bold;
-}
-
-.progress-bar-container {
-    background: repeating-linear-gradient(
-        135deg,          /* Hoek van de streepjes */
-        #8286867e,       /* Startkleur van het streepje */
-        #8286867e 1.4px,   /* Lengte van de kleur voor het streepje */
-        transparent 3px, /* Start van de transparante ruimte */
-        transparent 4px  /* Lengte van de transparante ruimte */
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent,
+        rgba(59, 130, 246, 0.5),
+        transparent
     );
-    height: 0.9vh;
-    position: relative;
-    display: block;
-    border-radius: 4px;
+    animation: shimmer 2s infinite;
 }
 
-#progress-bar {
-    background-color: #79EF0B;
-    width: 0%;
-    height: 0.9vh;
+@keyframes shimmer {
+    0%, 100% { 
+        opacity: 0; 
+    }
+    50% { 
+        opacity: 1; 
+    }
+}
+
+/* Label */
+.progressbar-label {
+    color: #f9fafb;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.progressbar-label::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+/* Progress Track */
+.progressbar-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 100px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Progress Fill */
+.progressbar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, 
+        #3b82f6 0%,
+        #60a5fa 50%,
+        #3b82f6 100%
+    );
+    background-size: 200% 100%;
+    border-radius: 100px;
+    transition: width 0.1s linear;
+    position: relative;
+    box-shadow: 
+        0 0 20px rgba(59, 130, 246, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    animation: gradient-shift 2s linear infinite;
+}
+
+@keyframes gradient-shift {
+    0% { 
+        background-position: 0% 50%; 
+    }
+    100% { 
+        background-position: 200% 50%; 
+    }
+}
+
+.progressbar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer-bar 1.5s infinite;
+}
+
+@keyframes shimmer-bar {
+    0% { 
+        transform: translateX(-100%); 
+    }
+    100% { 
+        transform: translateX(200%); 
+    }
+}
+
+/* Percentage */
+.progressbar-percentage {
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 10px;
+    text-align: right;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Cancel Hint */
+.cancel-hint {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 12px;
+    text-align: center;
+    opacity: 0;
+    animation: fadeInHint 0.5s 0.3s forwards;
+}
+
+@keyframes fadeInHint {
+    to { 
+        opacity: 1; 
+    }
+}
+
+.cancel-hint kbd {
+    background: rgba(51, 65, 85, 0.8);
+    padding: 2px 8px;
     border-radius: 4px;
-    transition: width 0.3s;
-    transition-timing-function: ease-out;
-    box-shadow: 0px 0px 30px #c2ff49cb;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .progressbar-wrapper {
+        min-width: 320px;
+        padding: 20px 24px;
+    }
+    
+    .progressbar-label {
+        font-size: 14px;
+    }
 }
