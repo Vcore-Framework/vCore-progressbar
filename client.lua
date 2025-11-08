@@ -1,3 +1,5 @@
+local VCore = exports['vCore']:GetCoreObject()
+
 local Action = {
     name = '',
     duration = 0,
@@ -144,12 +146,12 @@ local function StartProgress(action, onStart, onTick, onFinish)
                 Wait(1)
                 if onTick then onTick() end
                 if IsControlJustPressed(0, 200) and action.canCancel then
-                    TriggerEvent('progressbar:client:cancel')
+                    TriggerEvent('vCore:Client:Progressbar:Cancel')
                     wasCancelled = true
                     break
                 end
                 if IsEntityDead(playerPed) and not action.useWhileDead then
-                    TriggerEvent('progressbar:client:cancel')
+                    TriggerEvent('vCore:Client:Progressbar:Cancel')
                     wasCancelled = true
                     break
                 end
@@ -188,29 +190,29 @@ local function ActionCleanup()
     LocalPlayer.state:set('inv_busy', false, true)
 end
 
--- Events
+-- Events (vCore naming convention)
 
-RegisterNetEvent('progressbar:client:ToggleBusyness', function(bool)
+RegisterNetEvent('vCore:Client:Progressbar:ToggleBusyness', function(bool)
     isDoingAction = bool
 end)
 
-RegisterNetEvent('progressbar:client:progress', function(action, finish)
+RegisterNetEvent('vCore:Client:Progressbar:Start', function(action, finish)
     StartProgress(action, nil, nil, finish)
 end)
 
-RegisterNetEvent('progressbar:client:ProgressWithStartEvent', function(action, start, finish)
+RegisterNetEvent('vCore:Client:Progressbar:StartWithStartEvent', function(action, start, finish)
     StartProgress(action, start, nil, finish)
 end)
 
-RegisterNetEvent('progressbar:client:ProgressWithTickEvent', function(action, tick, finish)
+RegisterNetEvent('vCore:Client:Progressbar:StartWithTickEvent', function(action, tick, finish)
     StartProgress(action, nil, tick, finish)
 end)
 
-RegisterNetEvent('progressbar:client:ProgressWithStartAndTick', function(action, start, tick, finish)
+RegisterNetEvent('vCore:Client:Progressbar:StartWithStartAndTick', function(action, start, tick, finish)
     StartProgress(action, start, tick, finish)
 end)
 
-RegisterNetEvent('progressbar:client:cancel', function()
+RegisterNetEvent('vCore:Client:Progressbar:Cancel', function()
     ActionCleanup()
     SendNUIMessage({
         action = 'cancel'
@@ -226,27 +228,47 @@ end)
 
 -- Exports
 
-local function Progress(action, finish)
+exports('Progress', function(action, finish)
     StartProgress(action, nil, nil, finish)
-end
-exports('Progress', Progress)
+end)
 
-local function ProgressWithStartEvent(action, start, finish)
+exports('ProgressWithStartEvent', function(action, start, finish)
     StartProgress(action, start, nil, finish)
-end
-exports('ProgressWithStartEvent', ProgressWithStartEvent)
+end)
 
-local function ProgressWithTickEvent(action, tick, finish)
+exports('ProgressWithTickEvent', function(action, tick, finish)
     StartProgress(action, nil, tick, finish)
-end
-exports('ProgressWithTickEvent', ProgressWithTickEvent)
+end)
 
-local function ProgressWithStartAndTick(action, start, tick, finish)
+exports('ProgressWithStartAndTick', function(action, start, tick, finish)
     StartProgress(action, start, tick, finish)
-end
-exports('ProgressWithStartAndTick', ProgressWithStartAndTick)
+end)
 
-local function isDoingSomething()
+exports('IsDoingSomething', function()
     return isDoingAction
+end)
+
+-- vCore Integration
+if VCore then
+    VCore.Progressbar = {
+        Start = function(action, finish)
+            StartProgress(action, nil, nil, finish)
+        end,
+        StartWithStartEvent = function(action, start, finish)
+            StartProgress(action, start, nil, finish)
+        end,
+        StartWithTickEvent = function(action, tick, finish)
+            StartProgress(action, nil, tick, finish)
+        end,
+        StartWithStartAndTick = function(action, start, tick, finish)
+            StartProgress(action, start, tick, finish)
+        end,
+        Cancel = function()
+            ActionCleanup()
+            SendNUIMessage({ action = 'cancel' })
+        end,
+        IsActive = function()
+            return isDoingAction
+        end
+    }
 end
-exports('isDoingSomething', isDoingSomething)
